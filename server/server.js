@@ -11,6 +11,10 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 
+app.get("/", (req, res) => {
+  res.json({ message: "server is running " });
+});
+
 app.listen(process.env.PORT || 3000, async () => {
   console.log(
     `Server is running on port http://localhost:${process.env.PORT || 3000}`
