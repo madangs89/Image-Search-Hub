@@ -4,6 +4,9 @@ const searchInputShowSchema = new mongoose.Schema(
   {
     input: {
       type: String,
+      unique: true,
+      trim: true,
+      index: true,
       required: true,
     },
     searchCount: {
