@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { FiMenu, FiX } from "react-icons/fi";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const Navbar = () => {
   const location = useLocation();
@@ -41,10 +42,12 @@ const Navbar = () => {
         `${import.meta.env.VITE_BACKEND_URL}/auth/logout`
       );
       if (data.success) {
+        toast.success("Logout successful");
         navigate("/");
       }
     } catch (error) {
       console.error("Logout error:", error);
+      toast.error("Logout failed");
     } finally {
       setLogoutLoading(false);
     }
@@ -88,15 +91,14 @@ const Navbar = () => {
           >
             Logout
           </button>
-          {user &&
-            user?._id &&(
-              <div
-                className="bg-center bg-no-repeat bg-cover rounded-full size-10 border-2 border-indigo-400"
-                style={{
-                  backgroundImage: `url(${user?.avatar})`,
-                }}
-              ></div>
-            )}
+          {user && user?._id && (
+            <div
+              className="bg-center bg-no-repeat bg-cover rounded-full size-10 border-2 border-indigo-400"
+              style={{
+                backgroundImage: `url(${user?.avatar})`,
+              }}
+            ></div>
+          )}
         </div>
       </div>
 

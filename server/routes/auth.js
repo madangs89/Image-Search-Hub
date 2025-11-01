@@ -15,7 +15,7 @@ authRouter.get(
   passport.authenticate("google", { failureRedirect: "/auth/failure" }),
   (req, res) => {
     console.log("✅ Logged in user (Google):", req.user);
-    res.redirect("http://localhost:5173/dashboard");
+    res.redirect(`${process.env.CLIENT_URL}/dashboard`);
   }
 );
 
@@ -30,7 +30,7 @@ authRouter.get(
   passport.authenticate("facebook", { failureRedirect: "/auth/failure" }),
   (req, res) => {
     console.log("✅ Logged in user (Facebook):", req.user);
-    res.redirect("http://localhost:5173/dashboard");
+    res.redirect(`${process.env.CLIENT_URL}/dashboard`);
   }
 );
 
@@ -45,14 +45,15 @@ authRouter.get(
   passport.authenticate("github", { failureRedirect: "/auth/failure" }),
   (req, res) => {
     console.log("✅ Logged in user (GitHub):", req.user);
-    res.redirect("http://localhost:5173/dashboard");
+    res.redirect(`${process.env.CLIENT_URL}/dashboard`);
   }
 );
 
 // ========== FAILURE ROUTE ==========
 authRouter.get("/failure", (req, res) => {
   console.log("❌ Authentication failed");
-  res.status(401).json({ success: false, message: "Authentication failed" });
+  res.redirect(`${process.env.CLIENT_URL}/failure`);
+  // res.status(401).json({ success: false, message: "Authentication failed" });
 });
 
 // ========== STATUS ROUTE ==========

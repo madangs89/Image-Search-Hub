@@ -1,35 +1,10 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import { FiMenu, FiX } from "react-icons/fi";
-
-// ✅ Image Card Component
-const ImageCard = React.memo(({ src, isSelected, onToggle }) => (
-  <div
-    onClick={() => onToggle(src?.id)}
-    className="relative group rounded-xl overflow-hidden bg-gray-100 cursor-pointer"
-  >
-    <img
-      src={src?.urls?.small}
-      alt={`img-${src?.id}`}
-      loading="lazy"
-      className="w-full h-48 sm:h-56 object-cover transition-transform duration-300 group-hover:scale-105"
-    />
-    <div
-      className={`absolute top-3 right-3 w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all ${
-        isSelected
-          ? "border-[#6b21a8] bg-[#6b21a8]"
-          : "border-gray-300 bg-white"
-      }`}
-    >
-      {isSelected && <span className="text-white text-xs font-bold">✓</span>}
-    </div>
-  </div>
-));
-
-// ✅ Skeleton Loader
-const SkeletonCard = () => (
-  <div className="animate-pulse bg-gray-200 rounded-xl w-full h-48 sm:h-56" />
-);
+import ImageCard from "../components/ImageCard";
+import SkeletonCard from "../components/SkeletonCard";
+import SearchBar from "../components/SearchBar";
+import toast from "react-hot-toast";
 
 const Dashboard = () => {
   const [images, setImages] = useState([]);
@@ -48,10 +23,7 @@ const Dashboard = () => {
   const [selectedImages, setSelectedImages] = useState([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [details, setDetails] = useState({
-    total: "",
-    pages: "",
-  });
+  const [details, setDetails] = useState({ total: "", pages: "" });
   const [scrollLoading, setScrollLoading] = useState(false);
 
   // ✅ Fetch Images
@@ -85,40 +57,34 @@ const Dashboard = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-
     if (!searchQuery.trim()) return;
     (async () => {
       try {
         const { data } = await axios.post(
           `${import.meta.env.VITE_BACKEND_URL}/history/create`,
-          {
-            query: searchQuery.trim(),
-          },
+          { query: searchQuery.trim() },
           { withCredentials: true }
         );
-        console.log(data);
         if (data.success) {
-          clearTimeout(data.history);
           setHistory((prev) => [data.history, ...prev]);
         }
       } catch (error) {
         console.error("Error fetching search results:", error);
       }
     })();
+
     (async () => {
       try {
-        const d = await axios.post(
+        await axios.post(
           `${import.meta.env.VITE_BACKEND_URL}/top/create`,
-          {
-            query: searchQuery.trim(),
-          },
+          { query: searchQuery.trim() },
           { withCredentials: true }
         );
-        console.log(d);
       } catch (error) {
         console.error("Error fetching search results:", error);
       }
     })();
+
     setSelectedImages([]);
     setCurrentSearch(searchQuery.trim());
   };
@@ -130,30 +96,24 @@ const Dashboard = () => {
       !loading &&
       page < details.pages
     ) {
-      {
-        setScrollLoading(true);
-        try {
-          const { data } = await axios.get(
-            `${import.meta.env.VITE_BACKEND_URL}/search`,
-            {
-              params: { input: currentSearch, page: page + 1 },
-              withCredentials: true,
-            }
-          );
-
-          if (data.success) {
-            setDetails({
-              total: data.total,
-              pages: data.total_pages,
-            });
-            setImages((prevImages) => [...prevImages, ...data.results]);
-            setPage((prev) => prev + 1);
+      setScrollLoading(true);
+      try {
+        const { data } = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/search`,
+          {
+            params: { input: currentSearch, page: page + 1 },
+            withCredentials: true,
           }
-        } catch (error) {
-          console.error("Error loading more images:", error);
-        } finally {
-          setScrollLoading(false);
+        );
+        if (data.success) {
+          setDetails({ total: data.total, pages: data.total_pages });
+          setImages((prevImages) => [...prevImages, ...data.results]);
+          setPage((prev) => prev + 1);
         }
+      } catch (error) {
+        console.error("Error loading more images:", error);
+      } finally {
+        setScrollLoading(false);
       }
     }
   };
@@ -162,16 +122,15 @@ const Dashboard = () => {
     try {
       const { data } = await axios.delete(
         `${import.meta.env.VITE_BACKEND_URL}/history/delete/${id}`,
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
-      console.log(data);
       if (data.success) {
         setHistory((prev) => prev.filter((item) => item._id !== id));
+        toast.success("History deleted successfully");
       }
     } catch (error) {
       console.error("Error deleting history:", error);
+      toast.error("Error deleting history");
     }
   };
 
@@ -186,10 +145,7 @@ const Dashboard = () => {
           { withCredentials: true }
         );
         if (data.success) {
-          setDetails({
-            total: data.total,
-            pages: data.total_pages,
-          });
+          setDetails({ total: data.total, pages: data.total_pages });
           setImages(data.results);
         }
         setSearchQuery("");
@@ -220,10 +176,10 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="flex relative h-screen bg-[#fafbff] text-gray-900">
+    <div className="flex flex-col lg:flex-row relative h-screen bg-[#fafbff] text-gray-900">
       {/* Sidebar */}
       <aside
-        className={`sticky top-0 left-0 h-screen w-64 overflow-y-scroll bg-[#f3f2fb] border-r border-gray-200 p-5 transition-transform duration-300 z-50 ${
+        className={`fixed lg:static top-0 left-0 h-full lg:h-screen w-64 overflow-y-auto bg-[#f3f2fb] border-r border-gray-200 p-5 transition-transform duration-300 z-50 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
@@ -249,7 +205,6 @@ const Dashboard = () => {
                     : "hover:bg-[#f4f3ff]"
                 }`}
               >
-                {/* Left: Query and Date */}
                 <button
                   onClick={() => setCurrentSearch(item.query)}
                   className="flex flex-col text-left flex-1"
@@ -260,7 +215,6 @@ const Dashboard = () => {
                   </span>
                 </button>
 
-                {/* Right: Delete Button (visible on hover) */}
                 <button
                   onClick={() => handleDelete(item._id)}
                   className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-all ml-2"
@@ -291,52 +245,49 @@ const Dashboard = () => {
       {/* Main Section */}
       <main
         onScroll={handleScroll}
-        className="flex-1  pb-20 h-screen overflow-y-auto relative"
+        className="flex-1 h-screen overflow-y-auto pb-20 relative"
       >
         {/* Top Bar */}
-        <div className="sticky top-0 bg-[#fafbff] z-40 p-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-gray-200">
-          <div className="flex items-center gap-3 w-full sm:w-auto">
-            <button
-              className="lg:hidden text-gray-700"
-              onClick={() => setSidebarOpen(true)}
-            >
-              <FiMenu size={22} />
-            </button>
-            <h3 className="text-xl sm:text-2xl font-bold">
-              You searched for:{" "}
-              <span className="text-[#6b21a8]">{currentSearch}</span>
-            </h3>
-            <div className="flex gap-2">
-              <p className="text-sm text-gray-500">{details.total} results</p>
-              <p className="text-sm text-gray-500">
+        <div className="sticky top-0 bg-[#fafbff] z-40 p-4 flex flex-col sm:flex-row items-center justify-between gap-3 border-b border-gray-200">
+          <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
+            <div className="flex items-center gap-3">
+              <button
+                className="lg:hidden text-gray-700"
+                onClick={() => setSidebarOpen(true)}
+              >
+                <FiMenu size={22} />
+              </button>
+              <h3 className="text-lg sm:text-xl font-bold text-center sm:text-left">
+                You searched for:{" "}
+                <span className="text-[#6b21a8]">{currentSearch}</span>
+              </h3>
+            </div>
+            <div className="flex gap-2 text-sm text-gray-500 justify-center sm:justify-start">
+              <p>{details.total} results</p>
+              <p>
                 {details.pages} pages({page})
               </p>
             </div>
           </div>
 
           {/* Search Bar */}
-          <form
-            onSubmit={(e) => handleFormSubmit(e)}
-            className="w-full sm:w-72 relative"
-          >
-            <input
-              type="text"
-              placeholder="Search images..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#6b21a8] text-sm"
+          <div className="w-full sm:w-auto">
+            <SearchBar
+              handleFormSubmit={handleFormSubmit}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
             />
-          </form>
+          </div>
         </div>
 
         {/* Filters */}
-        <div className="flex justify-between pr-3">
-          <div className="flex flex-wrap gap-3 p-4 bg-[#fafbff]">
+        <div className="flex flex-wrap items-center justify-between px-3 py-2 bg-[#fafbff]">
+          <div className="flex flex-wrap gap-2">
             {filters.map((chip, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrentSearch(chip)}
-                className={`px-5 py-1.5 rounded-full text-sm font-medium transition ${
+                className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${
                   chip === currentSearch
                     ? "bg-[#6b21a8] text-white shadow-sm"
                     : "bg-white border border-gray-200 hover:bg-[#f6f5ff]"
@@ -346,11 +297,13 @@ const Dashboard = () => {
               </button>
             ))}
           </div>
-          <p className="">{selectedImages.length} Selected</p>
+          <p className="text-sm text-gray-600 mt-2 sm:mt-0">
+            {selectedImages.length} Selected
+          </p>
         </div>
 
         {/* Image Grid */}
-        <div className="p-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
+        <div className="p-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
           {loading
             ? Array.from({ length: 15 }).map((_, idx) => (
                 <SkeletonCard key={idx} />
@@ -369,11 +322,7 @@ const Dashboard = () => {
                   No images found.
                 </p>
               )}
-          {scrollLoading && (
-            <>
-              <SkeletonCard />
-            </>
-          )}
+          {scrollLoading && <SkeletonCard />}
         </div>
       </main>
     </div>
