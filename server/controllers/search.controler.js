@@ -4,6 +4,13 @@ import SearchInputShow from "../models/Search.js";
 export const SearchController = async (req, res) => {
   console.log("getting request");
   try {
+    let userId = null;
+    console.log(req.isAuthenticated(), "in create history");
+
+    if (req.isAuthenticated()) {
+      userId = req.user._id;
+    }
+
     const { input, page = 1 } = req.query;
     if (!input) {
       return res

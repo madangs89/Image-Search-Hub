@@ -2,6 +2,12 @@ import axios from "axios";
 import SearchInputShow from "../models/Search.js";
 export const TopSearchFinder = async (req, res) => {
   try {
+    let userId = null;
+    console.log(req.isAuthenticated(), "in create history");
+
+    if (req.isAuthenticated()) {
+      userId = req.user._id;
+    }
     const topSearchData = await SearchInputShow.find()
       .sort({ searchCount: -1 })
       .sort({ createdAt: -1 })
