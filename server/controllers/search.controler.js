@@ -25,7 +25,6 @@ export const SearchController = async (req, res) => {
         },
       }
     );
-
     console.log(data.data);
     return res.status(200).json({
       message: "Search results fetched successfully",

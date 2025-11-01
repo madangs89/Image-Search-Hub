@@ -9,7 +9,6 @@ const Login = () => {
         {/* Background Gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#a18cd1] via-[#fbc2eb] to-[#fad0c4]"></div>
         <div className="absolute inset-0 bg-white/15 backdrop-blur-sm"></div>
-
         {/* Content */}
         <div className="relative z-10 p-10 flex flex-col items-center w-full">
           <h1 className="text-4xl font-extrabold text-white drop-shadow-sm mb-3">
@@ -26,7 +25,7 @@ const Login = () => {
           <div className="flex flex-col w-full max-w-xs gap-4">
             {/* Google */}
             <Link
-              to="http://localhost:5000/auth/google"
+              to="http://localhost:3000/auth/google"
               className="flex items-center justify-center gap-3 h-12 rounded-lg bg-white text-gray-800 font-medium shadow-md hover:shadow-xl hover:scale-[1.05] transition-all duration-300"
             >
               <img
@@ -40,7 +39,7 @@ const Login = () => {
 
             {/* Facebook */}
             <Link
-              to="http://localhost:5000/auth/facebook"
+              to="http://localhost:3000/auth/facebook"
               className="flex items-center justify-center gap-3 h-12 rounded-lg bg-[#1877F2] text-white font-medium shadow-md hover:shadow-xl hover:scale-[1.05] transition-all duration-300"
             >
               <img
@@ -54,7 +53,7 @@ const Login = () => {
 
             {/* GitHub */}
             <Link
-              to="http://localhost:5000/auth/github"
+              to="http://localhost:3000/auth/github"
               className="flex items-center justify-center gap-3 h-12 rounded-lg bg-[#24292E] text-white font-medium shadow-md hover:shadow-xl hover:scale-[1.05] transition-all duration-300"
             >
               <img
