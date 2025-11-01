@@ -1,61 +1,85 @@
-Image Search Hub — MERN + OAuth Project
+# 🖼️ Image Search Hub — MERN + OAuth Project
 
-A full-stack image search application built with MERN (MongoDB, Express.js, React.js, Node.js) and OAuth authentication (Google, Facebook, GitHub).
-Authenticated users can search images from Unsplash, view their search history, see the top global search trends, and select multiple images from a sleek UI.
+A full-stack image search application built with **MERN (MongoDB, Express.js, React.js, Node.js)** and **OAuth authentication (Google, Facebook, GitHub)**.  
+Authenticated users can search images from **Unsplash**, view their search history, see the top global search trends, and select multiple images from a sleek UI.
 
-🚀 Tech Stack
-🔹 Frontend:
-React.js (Vite)
-Tailwind CSS
-Axios
-React Router DOM
-React Hot Toast
-Framer Motion
+---
 
-🔹 Backend:
-Node.js
-Express.js
-MongoDB + Mongoose
-Passport.js (OAuth)
-Axios (for Unsplash)
-express-session
-dotenv
-cors
-cookie-parser
+## 🚀 Tech Stack
 
-📁 Project Structure
+### 🔹 Frontend
+- React.js (Vite)
+- Tailwind CSS
+- Axios
+- React Router DOM
+- React Hot Toast
+- Framer Motion
+
+### 🔹 Backend
+- Node.js
+- Express.js
+- MongoDB + Mongoose
+- Passport.js (OAuth)
+- Axios (for Unsplash)
+- express-session
+- dotenv
+- cors
+- cookie-parser
+
+---
+
+## 📁 Project Structure
 Image-Search-Hub/
 │
-├── /client            # React frontend
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   └── vite.config.js
+├── 📂 client # React frontend (Vite)
+│ ├── 📂 src
+│ │ ├── 📂 components # Reusable UI components
+│ │ ├── 📂 pages # Application pages
+│ │ ├── App.jsx # Main app component
+│ │ └── main.jsx # React entry point
+│ │
+│ ├── vite.config.js # Vite configuration
+│ ├── package.json # Frontend dependencies
+│ └── .env # Frontend environment variables (VITE_*)
 │
-└── /server            # Node.js backend
-    ├── config/
-    │   └── dbConnect.js
-    ├── controllers/
-    ├── models/
-    ├── routes/
-    ├── server.js
-    └── .env
+└── 📂 server # Node.js backend (Express)
+├── 📂 config # Database & environment configuration
+│ └── dbConnect.js
+│
+├── 📂 controllers # Request handler logic
+├── 📂 models # Mongoose models
+├── 📂 routes # Express route definitions
+├── server.js # Entry point of backend server
+├── package.json # Backend dependencies
+└── .env # Backend environment variables
 
-🧩 Backend (Server)
-⚙️ Setup Instructions
 
-Navigate to the server directory:
+---
 
+## 🖼️ Screenshots
+
+| Feature         | Screenshot |
+|-----------------|-------------|
+| **Login Page** | <img width="1919" height="908" alt="Login Page" src="https://github.com/user-attachments/assets/9f9ab937-1bc7-40ac-8176-db9bac700994" /> |
+| **Dashboard** | <img width="1918" height="920" alt="Dashboard" src="https://github.com/user-attachments/assets/ee4e71c6-4eab-496a-846a-6d4684e6b8fd" /> |
+| **Top Searches** | <img width="1915" height="918" alt="Top Searches" src="https://github.com/user-attachments/assets/1941a736-d99b-4b75-82d4-0281f4a081e3" /> |
+| **History Sidebar** | <img width="498" height="929" alt="History Sidebar" src="https://github.com/user-attachments/assets/ac2277e6-b35f-46ed-8230-2ecf86d4124d" /> |
+| **Multi-Select** | <img width="1919" height="919" alt="Multi-Select" src="https://github.com/user-attachments/assets/f2f5294e-1fbb-4695-9576-1c4b21bd09f8" /> |
+
+---
+
+## 🧩 Backend (Server)
+
+### ⚙️ Setup Instructions
+
+1️⃣ Navigate to the server directory**
 cd server
-
-Install dependencies:
+2️⃣ Install dependencies
 
 npm install
 
 
-Create .env file in /server directory:
+3️⃣ Create .env file in /server directory
 
 # -------------------------------
 # SERVER CONFIGURATION
@@ -93,22 +117,21 @@ GITHUB_CLIENT_SECRET=<your_github_client_secret>
 GITHUB_CALLBACK_URL=http://localhost:3000/auth/github/callback
 
 
-Run the backend:
+4️⃣ Run the backend
 
 npm run dev
 
-(or)
+
+or
 
 node server.js
 
 
 Server runs on:
-http://localhost:3000
-
+👉 http://localhost:3000
 
 📡 API Endpoints Summary
-
-|   Method   | Endpoint               |  Description                                 |
+| Method     | Endpoint               | Description                                  |
 | ---------- | ---------------------- | -------------------------------------------- |
 | **GET**    | `/`                    | Test route (Server is running)               |
 | **GET**    | `/auth/google`         | Google login                                 |
@@ -123,7 +146,7 @@ http://localhost:3000
 | **GET**    | `/history`             | Get user’s search history                    |
 | **DELETE** | `/history/delete/:id`  | Delete a search from user history            |
 
-🧠 Features Implemented
+🧠 Backend Features
 
 ✅ OAuth login with Google, Facebook, GitHub
 ✅ Session-based authentication
@@ -136,28 +159,27 @@ http://localhost:3000
 🎨 Frontend (Client)
 ⚙️ Setup Instructions
 
-Navigate to client directory:
+1️⃣ Navigate to client directory
 
 cd client
 
-
-Install dependencies:
+2️⃣ Install dependencies
 
 npm install
 
+3️⃣ Create .env file in /client directory
 
-Create .env file in /client directory:
-
+env
+Copy code
 VITE_BACKEND_URL=http://localhost:3000
 
-
-Run the frontend:
+4️⃣ Run the frontend
 
 npm run dev
 
 
 App runs on:
-http://localhost:5173
+👉 http://localhost:5173
 
 🧱 Main Components
 | Component          | Role                                                    |
@@ -169,7 +191,7 @@ http://localhost:5173
 | `SkeletonCard.jsx` | Loading placeholder                                     |
 | `PageLoader.jsx`   | Global loader for transitions                           |
 | `SearchBar.jsx`    | Input component for search term                         |
-| `AuthFailure.jsx`  | Handles failed OAuth                                    |
+| `AuthFailure.jsx`  | Handles failed OAuth logins                             |
 | `NotFound.jsx`     | Fallback for undefined routes                           |
 
 🧠 Frontend Features
@@ -184,16 +206,15 @@ http://localhost:5173
 ✅ Page loader & fallback handling
 ✅ Fully responsive and mobile-friendly
 
+🔧 Environment Setup for Production
 
-🛠️ Deployment Guide
+Use real OAuth callback URLs (not localhost)
 
-Frontend: Deploy to Vercel, Netlify, or Hostinger.
+Ensure CORS origin matches your deployed frontend URL
 
-Backend: Deploy to Render, Railway, or Hostinger (Node.js service).
+Set:
 
-Set environment variables for production:
+cookie: { secure: true, sameSite: "none" }
 
-Use real OAuth callback URLs (not localhost).
 
-Ensure CORS origin matches frontend URL.
-Use cookie: { secure: true, sameSite: "none" } for HTTPS.
+for HTTPS environments.
