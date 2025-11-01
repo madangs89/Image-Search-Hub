@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Login from "./pages/Login";
 import Navbar from "./components/Navbar";
-import { Route, Routes, useNavigate } from "react-router-dom";
+import { Route, Routes, useLocation, useNavigate } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import { useEffect } from "react";
 import axios from "axios";
@@ -12,6 +12,7 @@ import NotFound from "./pages/NotFound";
 const App = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
   useEffect(() => {
     (async () => {
       try {

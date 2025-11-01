@@ -39,7 +39,9 @@ const Navbar = () => {
     try {
       setLogoutLoading(true);
       const { data } = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/auth/logout`
+        `${import.meta.env.VITE_BACKEND_URL}/auth/logout`,
+        {},
+        { withCredentials: true }
       );
       if (data.success) {
         toast.success("Logout successful");

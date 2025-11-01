@@ -31,7 +31,8 @@ export const TopSearchFinder = async (req, res) => {
         total: data.data.total,
         total_pages: data.data.total_pages,
         results: data.data.results,
-        currentSearch: "nature",
+        currentSearch: "top",
+        topSearch: "Nature",
       });
     }
     const input = topSearchData[0].input;
@@ -53,7 +54,8 @@ export const TopSearchFinder = async (req, res) => {
       total: data.data.total,
       total_pages: data.data.total_pages,
       results: data.data.results,
-      currentSearch: input,
+      currentSearch: "top",
+      topSearch: input,
     });
   } catch (error) {
     console.log(error);

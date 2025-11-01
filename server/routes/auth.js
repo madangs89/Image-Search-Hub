@@ -89,7 +89,9 @@ authRouter.post("/logout", (req, res) => {
       }
 
       req.session.destroy(() => {
-        res.clearCookie("token");
+        res.clearCookie("token", {
+          secure: false,
+        });
         return res.json({
           success: true,
           message: "Logged out successfully",

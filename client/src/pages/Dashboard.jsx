@@ -5,13 +5,15 @@ import ImageCard from "../components/ImageCard";
 import SkeletonCard from "../components/SkeletonCard";
 import SearchBar from "../components/SearchBar";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [topSearchData, setTopSearchData] = useState("");
   const [page, setPage] = useState(1);
   const [history, setHistory] = useState([]);
-  const [filters, setFilters] = useState([
+  const [filters] = useState([
     "All",
     "Nature",
     "Abstract",
@@ -26,6 +28,29 @@ const Dashboard = () => {
   const [details, setDetails] = useState({ total: "", pages: "" });
   const [scrollLoading, setScrollLoading] = useState(false);
 
+  const navigate = useNavigate();
+
+
+    useEffect(() => {
+    (async () => {
+      try {
+        const res = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/auth/status`,
+          {
+            withCredentials: true,
+          }
+        );
+        console.log("Auth Status:", res.data);
+        if (!res.data.authenticated) {
+          navigate("/");
+        } 
+      } catch (error) {
+        // navigate("/");
+        console.error("Error fetching auth status:", error);
+      } 
+    })();
+  }, []);
+
   // ✅ Fetch Images
   useEffect(() => {
     const fetchTopImages = async () => {
@@ -38,6 +63,7 @@ const Dashboard = () => {
         if (data.success) {
           setCurrentSearch(data.currentSearch);
           setImages(data.results);
+          setTopSearchData(data.topSearch);
         }
       } catch (err) {
         console.error("Error fetching images:", err);
@@ -257,10 +283,18 @@ const Dashboard = () => {
               >
                 <FiMenu size={22} />
               </button>
-              <h3 className="text-lg sm:text-xl font-bold text-center sm:text-left">
-                You searched for:{" "}
-                <span className="text-[#6b21a8]">{currentSearch}</span>
-              </h3>
+
+              {currentSearch == "top" ? (
+                <h3 className="text-lg sm:text-xl font-bold text-center sm:text-left">
+                  Highest Searched{" "}
+                  <span className="text-[#6b21a8]">{topSearchData}</span>
+                </h3>
+              ) : (
+                <h3 className="text-lg sm:text-xl font-bold text-center sm:text-left">
+                  You searched for:{" "}
+                  <span className="text-[#6b21a8]">{currentSearch}</span>
+                </h3>
+              )}
             </div>
             <div className="flex gap-2 text-sm text-gray-500 justify-center sm:justify-start">
               <p>{details.total} results</p>
