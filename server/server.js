@@ -9,6 +9,7 @@ import session from "express-session";
 import passport from "passport";
 import { connectDB } from "./config/dbConnect.js";
 import TopSearchesRouter from "./routes/topSearches.js";
+import historyRouter from "./routes/history.js";
 
 const app = express();
 
@@ -45,6 +46,7 @@ app.get("/", (req, res) => {
 app.use("/search", SearchRouter);
 app.use("/auth", authRouter);
 app.use("/top" , TopSearchesRouter)
+app.use("/history" , historyRouter)
 
 console.log({
   clientID: process.env.GOOGLE_CLIENT_ID,

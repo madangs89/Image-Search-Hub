@@ -4,11 +4,11 @@ export const TopSearchFinder = async (req, res) => {
   try {
     const topSearchData = await SearchInputShow.find()
       .sort({ searchCount: -1 })
-      .limit(1);
+      .limit(5);
 
     console.log(topSearchData);
 
-    if (topSearchData.length === 0) {
+    if (topSearchData.length == 0) {
       const data = await axios.get(
         `https://api.unsplash.com/search/photos?query=${"nature"}&page=${"1"}&per_page=20`,
         {
@@ -17,7 +17,6 @@ export const TopSearchFinder = async (req, res) => {
           },
         }
       );
-      console.log(data.data);
       return res.status(200).json({
         message: "Search results fetched successfully",
         success: true,
@@ -25,9 +24,13 @@ export const TopSearchFinder = async (req, res) => {
         total: data.data.total,
         total_pages: data.data.total_pages,
         results: data.data.results,
+        currentSearch: "nature",
       });
     }
     const input = topSearchData[0].input;
+    console.log(input);
+    const page = 1;
+    
     const data = await axios.get(
       `https://api.unsplash.com/search/photos?query=${input}&page=${page}&per_page=20`,
       {
@@ -36,7 +39,6 @@ export const TopSearchFinder = async (req, res) => {
         },
       }
     );
-    console.log(data.data);
     return res.status(200).json({
       message: "Search results fetched successfully",
       success: true,
@@ -44,6 +46,7 @@ export const TopSearchFinder = async (req, res) => {
       total: data.data.total,
       total_pages: data.data.total_pages,
       results: data.data.results,
+      currentSearch: input,
     });
   } catch (error) {
     console.log(error);

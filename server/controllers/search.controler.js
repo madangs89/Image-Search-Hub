@@ -4,7 +4,7 @@ import SearchInputShow from "../models/Search.js";
 export const SearchController = async (req, res) => {
   console.log("getting request");
   try {
-    const { input, page = 1 } = req.body;
+    const { input, page = 1 } = req.query;
     if (!input) {
       return res
         .status(400)
@@ -25,7 +25,6 @@ export const SearchController = async (req, res) => {
         },
       }
     );
-    console.log(data.data);
     return res.status(200).json({
       message: "Search results fetched successfully",
       success: true,
@@ -37,5 +36,27 @@ export const SearchController = async (req, res) => {
     return res
       .status(500)
       .json({ message: "Internal server error", success: false });
+  }
+};
+
+export const createSearchEntry = async (req, res) => {
+  try {
+    const { query } = req.body;
+    console.log(query);
+
+    const isSearchFound = await SearchInputShow.findOne({ input: query });
+    if (!isSearchFound) {
+      await SearchInputShow.create({ input: query });
+    } else {
+      isSearchFound.searchCount += 1;
+      await isSearchFound.save();
+    }
+    console.log(isSearchFound);
+
+    return res
+      .status(200)
+      .json({ message: "Search entry created successfully", success: true });
+  } catch (error) {
+    console.log(error);
   }
 };

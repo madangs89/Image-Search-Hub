@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
+import { FiMenu, FiX } from "react-icons/fi";
 
-// Memoized image card
+// ✅ Image Card Component
 const ImageCard = React.memo(({ src, isSelected, onToggle }) => (
   <div
     onClick={() => onToggle(src?.id)}
@@ -25,7 +26,7 @@ const ImageCard = React.memo(({ src, isSelected, onToggle }) => (
   </div>
 ));
 
-// Skeleton card for loading state
+// ✅ Skeleton Loader
 const SkeletonCard = () => (
   <div className="animate-pulse bg-gray-200 rounded-xl w-full h-48 sm:h-56" />
 );
@@ -33,14 +34,9 @@ const SkeletonCard = () => (
 const Dashboard = () => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [history] = useState([
-    "Abstract",
-    "Architecture",
-    "Minimalist",
-    "Wallpapers",
-    "Animals",
-  ]);
-  const [filters] = useState([
+  const [page, setPage] = useState(1);
+  const [history, setHistory] = useState([]);
+  const [filters, setFilters] = useState([
     "All",
     "Nature",
     "Abstract",
@@ -50,7 +46,15 @@ const Dashboard = () => {
   ]);
   const [currentSearch, setCurrentSearch] = useState("All");
   const [selectedImages, setSelectedImages] = useState([]);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [details, setDetails] = useState({
+    total: "",
+    pages: "",
+  });
+  const [scrollLoading, setScrollLoading] = useState(false);
 
+  // ✅ Fetch Images
   useEffect(() => {
     const fetchTopImages = async () => {
       setLoading(true);
@@ -59,7 +63,10 @@ const Dashboard = () => {
           `${import.meta.env.VITE_BACKEND_URL}/top`,
           { withCredentials: true }
         );
-        if (data.success) setImages(data.results);
+        if (data.success) {
+          setCurrentSearch(data.currentSearch);
+          setImages(data.results);
+        }
       } catch (err) {
         console.error("Error fetching images:", err);
       } finally {
@@ -69,90 +76,258 @@ const Dashboard = () => {
     fetchTopImages();
   }, []);
 
+  // ✅ Toggle selection
   const toggleImageSelect = useCallback((id) => {
     setSelectedImages((prev) =>
-      prev.includes(id)
-        ? prev.filter((item) => item !== id)
-        : [...prev, id]
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
+  }, []);
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) return;
+    (async () => {
+      try {
+        const { data } = await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/history/create`,
+          {
+            query: searchQuery.trim(),
+          },
+          { withCredentials: true }
+        );
+        console.log(data);
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+      }
+    })();
+    (async () => {
+      try {
+        const d = await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/top/create`,
+          {
+            query: searchQuery.trim(),
+          },
+          { withCredentials: true }
+        );
+        console.log(d);
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+      }
+    })();
+    setCurrentSearch(searchQuery.trim());
+    setHistory((prev) => [
+      { query: searchQuery.trim(), createdAt: Date.now() },
+      ...prev,
+    ]);
+  };
+
+  const handleScroll = async (e) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.target;
+    if (
+      scrollTop + clientHeight >= scrollHeight - 5 &&
+      !loading &&
+      page < details.pages
+    ) {
+      {
+        setScrollLoading(true);
+        try {
+          const { data } = await axios.get(
+            `${import.meta.env.VITE_BACKEND_URL}/search`,
+            {
+              params: { input: currentSearch, page: page + 1 },
+              withCredentials: true,
+            }
+          );
+
+          if (data.success) {
+            setDetails({
+              total: data.total,
+              pages: data.total_pages,
+            });
+            setImages((prevImages) => [...prevImages, ...data.results]);
+            setPage((prev) => prev + 1);
+          }
+        } catch (error) {
+          console.error("Error loading more images:", error);
+        } finally {
+          setScrollLoading(false);
+        }
+      }
+    }
+  };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoading(true);
+        const { data } = await axios.get(
+          `${
+            import.meta.env.VITE_BACKEND_URL
+          }/search?input=${currentSearch}&page=${page}`,
+          { withCredentials: true }
+        );
+        if (data.success) {
+          setDetails({
+            total: data.total,
+            pages: data.total_pages,
+          });
+          setImages(data.results);
+        }
+        setSearchQuery("");
+        setPage(1);
+      } catch (error) {
+        console.error("Error fetching search results:", error);
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, [currentSearch]);
+
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const { data } = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/history`,
+          { withCredentials: true }
+        );
+        if (data.success) {
+          setHistory(data.history);
+        }
+      } catch (error) {
+        console.error("Error fetching search history:", error);
+      }
+    };
+    fetchHistory();
   }, []);
 
   return (
     <div className="flex h-screen bg-[#fafbff] text-gray-900">
       {/* Sidebar */}
-      <aside className="hidden lg:block w-64 fixed top-0 left-0 h-screen bg-[#f3f2fb] border-r border-gray-200 p-5 overflow-y-auto">
-        <h2 className="text-lg font-semibold text-gray-800 mb-1">
-          Your Search History
-        </h2>
+      <aside
+        className={`fixed top-0 left-0 h-screen w-64 overflow-y-scroll bg-[#f3f2fb] border-r border-gray-200 p-5 transition-transform duration-300 z-50 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+        }`}
+      >
+        <div className="flex justify-between items-center mb-4 lg:mb-6">
+          <h2 className="text-lg font-semibold text-gray-800">
+            Search History
+          </h2>
+          <button
+            className="lg:hidden text-gray-600"
+            onClick={() => setSidebarOpen(false)}
+          >
+            <FiX size={20} />
+          </button>
+        </div>
+
         <p className="text-sm text-gray-500 mb-4">Recent searches</p>
 
         <div className="flex flex-col gap-2">
           {history.map((item, idx) => (
             <button
               key={idx}
-              onClick={() => setCurrentSearch(item)}
+              onClick={() => setCurrentSearch(item.query)}
               className={`text-left w-full px-3 py-2 rounded-lg cursor-pointer transition-all ${
-                currentSearch === item
+                currentSearch === item.query
                   ? "bg-[#ede9fe] text-[#6b21a8] font-medium"
                   : "hover:bg-[#f4f3ff]"
               }`}
             >
-              <span className="text-sm">{item}</span>
+              <span className="text-sm">{item.query}</span>
+              <span className="text-xs text-gray-500">
+                {new Date(item.createdAt).toLocaleString()}
+              </span>
             </button>
           ))}
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 lg:ml-64 h-screen overflow-y-auto p-5 lg:p-10">
-        {/* Filter Section */}
-        <div className="flex flex-wrap gap-3 pb-6  bg-[#fafbff] z-10 pt-2">
-          {filters.map((chip, idx) => (
+      {/* Main Section */}
+      <main
+        onScroll={handleScroll}
+        className="flex-1 lg:ml-64 pb-20 h-screen overflow-y-auto relative"
+      >
+        {/* Top Bar */}
+        <div className="sticky top-0 bg-[#fafbff] z-40 p-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-gray-200">
+          <div className="flex items-center gap-3 w-full sm:w-auto">
             <button
-              onClick={() => setCurrentSearch(chip)}
-              key={idx}
-              className={`px-5 py-1.5 rounded-full text-sm font-medium transition ${
-                chip === currentSearch
-                  ? "bg-[#6b21a8] text-white shadow-sm"
-                  : "bg-white border border-gray-200 hover:bg-[#f6f5ff]"
-              }`}
+              className="lg:hidden text-gray-700"
+              onClick={() => setSidebarOpen(true)}
             >
-              {chip}
+              <FiMenu size={22} />
             </button>
-          ))}
+            <h3 className="text-xl sm:text-2xl font-bold">
+              You searched for:{" "}
+              <span className="text-[#6b21a8]">{currentSearch}</span>
+            </h3>
+            <div className="flex gap-2">
+              <p className="text-sm text-gray-500">{details.total} results</p>
+              <p className="text-sm text-gray-500">
+                {details.pages} pages({page})
+              </p>
+            </div>
+          </div>
+
+          {/* Search Bar */}
+          <form
+            onSubmit={(e) => handleFormSubmit(e)}
+            className="w-full sm:w-72 relative"
+          >
+            <input
+              type="text"
+              placeholder="Search images..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-2 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-[#6b21a8] text-sm"
+            />
+          </form>
         </div>
 
-        {/* Title Section */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-6">
-          <h3 className="text-xl sm:text-2xl font-bold">
-            You searched for:{" "}
-            <span className="text-[#6b21a8] font-semibold">
-              {currentSearch}
-            </span>{" "}
-            — {images.length} results
-          </h3>
-          <p className="text-[#6b21a8] text-sm font-medium mt-2 sm:mt-0">
-            Selected: {selectedImages.length} image
-            {selectedImages.length !== 1 ? "s" : ""}
-          </p>
+        {/* Filters */}
+        <div className="flex justify-between pr-3">
+          <div className="flex flex-wrap gap-3 p-4 bg-[#fafbff]">
+            {filters.map((chip, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentSearch(chip)}
+                className={`px-5 py-1.5 rounded-full text-sm font-medium transition ${
+                  chip === currentSearch
+                    ? "bg-[#6b21a8] text-white shadow-sm"
+                    : "bg-white border border-gray-200 hover:bg-[#f6f5ff]"
+                }`}
+              >
+                {chip}
+              </button>
+            ))}
+          </div>
+          <p className="">{selectedImages.length} Selected</p>
         </div>
 
         {/* Image Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4 pb-10">
+        <div className="p-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-5 gap-4">
           {loading
-            ? // 🔄 Show skeletons while loading
-              Array.from({ length: 15 }).map((_, idx) => (
+            ? Array.from({ length: 15 }).map((_, idx) => (
                 <SkeletonCard key={idx} />
               ))
-            : // ✅ Show actual images
-              images.map((src) => (
+            : images.length > 0
+            ? images.map((src) => (
                 <ImageCard
                   key={src?.id}
                   src={src}
                   isSelected={selectedImages.includes(src?.id)}
                   onToggle={toggleImageSelect}
                 />
-              ))}
+              ))
+            : !loading && (
+                <p className="col-span-full text-center text-gray-500">
+                  No images found.
+                </p>
+              )}
+          {scrollLoading && (
+            <>
+              <SkeletonCard />
+            </>
+          )}
         </div>
       </main>
     </div>
