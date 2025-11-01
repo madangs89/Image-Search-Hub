@@ -13,11 +13,13 @@ import historyRouter from "./routes/history.js";
 
 const app = express();
 
-app.use(cors({
-  origin: process.env.CLIENT_URL,
-  credentials: true,
-  allowedHeaders: ["Content-Type", "Authorization"],
-}));
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
@@ -31,7 +33,6 @@ app.use(
     cookie: {
       secure: false, // set true in production (HTTPS)
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
-
     },
   })
 );
@@ -45,13 +46,14 @@ app.get("/", (req, res) => {
 
 app.use("/search", SearchRouter);
 app.use("/auth", authRouter);
-app.use("/top" , TopSearchesRouter)
-app.use("/history" , historyRouter)
+app.use("/top", TopSearchesRouter);
+app.use("/history", historyRouter);
 
 console.log({
   clientID: process.env.GOOGLE_CLIENT_ID,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET,
   callbackURL: process.env.GOOGLE_CALLBACK_URL,
+  cl: process.env.CLIENT_URL,
 });
 
 app.listen(process.env.PORT || 3000, async () => {

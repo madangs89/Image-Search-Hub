@@ -17,6 +17,8 @@ const App = () => {
     (async () => {
       try {
         setLoading(true);
+        console.log(import.meta.env.VITE_BACKEND_URL);
+        
         const res = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/auth/status`,
           {

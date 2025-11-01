@@ -30,8 +30,7 @@ const Dashboard = () => {
 
   const navigate = useNavigate();
 
-
-    useEffect(() => {
+  useEffect(() => {
     (async () => {
       try {
         const res = await axios.get(
@@ -43,11 +42,11 @@ const Dashboard = () => {
         console.log("Auth Status:", res.data);
         if (!res.data.authenticated) {
           navigate("/");
-        } 
+        }
       } catch (error) {
         // navigate("/");
         console.error("Error fetching auth status:", error);
-      } 
+      }
     })();
   }, []);
 
