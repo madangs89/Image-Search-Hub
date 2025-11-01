@@ -85,6 +85,7 @@ const Dashboard = () => {
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
+
     if (!searchQuery.trim()) return;
     (async () => {
       try {
@@ -96,6 +97,10 @@ const Dashboard = () => {
           { withCredentials: true }
         );
         console.log(data);
+        if (data.success) {
+          clearTimeout(data.history);
+          setHistory((prev) => [data.history, ...prev]);
+        }
       } catch (error) {
         console.error("Error fetching search results:", error);
       }
@@ -114,11 +119,8 @@ const Dashboard = () => {
         console.error("Error fetching search results:", error);
       }
     })();
+    setSelectedImages([]);
     setCurrentSearch(searchQuery.trim());
-    setHistory((prev) => [
-      { query: searchQuery.trim(), createdAt: Date.now() },
-      ...prev,
-    ]);
   };
 
   const handleScroll = async (e) => {
@@ -153,6 +155,23 @@ const Dashboard = () => {
           setScrollLoading(false);
         }
       }
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      const { data } = await axios.delete(
+        `${import.meta.env.VITE_BACKEND_URL}/history/delete/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
+      console.log(data);
+      if (data.success) {
+        setHistory((prev) => prev.filter((item) => item._id !== id));
+      }
+    } catch (error) {
+      console.error("Error deleting history:", error);
     }
   };
 
@@ -201,10 +220,10 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="flex h-screen bg-[#fafbff] text-gray-900">
+    <div className="flex relative h-screen bg-[#fafbff] text-gray-900">
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-screen w-64 overflow-y-scroll bg-[#f3f2fb] border-r border-gray-200 p-5 transition-transform duration-300 z-50 ${
+        className={`sticky top-0 left-0 h-screen w-64 overflow-y-scroll bg-[#f3f2fb] border-r border-gray-200 p-5 transition-transform duration-300 z-50 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
@@ -219,33 +238,60 @@ const Dashboard = () => {
             <FiX size={20} />
           </button>
         </div>
-
-        <p className="text-sm text-gray-500 mb-4">Recent searches</p>
-
         <div className="flex flex-col gap-2">
-          {history.map((item, idx) => (
-            <button
-              key={idx}
-              onClick={() => setCurrentSearch(item.query)}
-              className={`text-left w-full px-3 py-2 rounded-lg cursor-pointer transition-all ${
-                currentSearch === item.query
-                  ? "bg-[#ede9fe] text-[#6b21a8] font-medium"
-                  : "hover:bg-[#f4f3ff]"
-              }`}
-            >
-              <span className="text-sm">{item.query}</span>
-              <span className="text-xs text-gray-500">
-                {new Date(item.createdAt).toLocaleString()}
-              </span>
-            </button>
-          ))}
+          {history && history.length > 0 ? (
+            history.map((item, idx) => (
+              <div
+                key={idx}
+                className={`group flex items-center justify-between px-3 py-2 rounded-lg transition-all ${
+                  currentSearch === item.query
+                    ? "bg-[#ede9fe] text-[#6b21a8] font-medium"
+                    : "hover:bg-[#f4f3ff]"
+                }`}
+              >
+                {/* Left: Query and Date */}
+                <button
+                  onClick={() => setCurrentSearch(item.query)}
+                  className="flex flex-col text-left flex-1"
+                >
+                  <span className="text-sm truncate">{item.query}</span>
+                  <span className="text-xs text-gray-500">
+                    {new Date(item.createdAt).toLocaleDateString()}
+                  </span>
+                </button>
+
+                {/* Right: Delete Button (visible on hover) */}
+                <button
+                  onClick={() => handleDelete(item._id)}
+                  className="opacity-0 group-hover:opacity-100 text-gray-400 hover:text-red-500 transition-all ml-2"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.8}
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </button>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-gray-500">No search history found.</p>
+          )}
         </div>
       </aside>
 
       {/* Main Section */}
       <main
         onScroll={handleScroll}
-        className="flex-1 lg:ml-64 pb-20 h-screen overflow-y-auto relative"
+        className="flex-1  pb-20 h-screen overflow-y-auto relative"
       >
         {/* Top Bar */}
         <div className="sticky top-0 bg-[#fafbff] z-40 p-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-gray-200">

@@ -95,14 +95,23 @@ authRouter.get("/status", (req, res) => {
   }
 });
 
-authRouter.get("/logout", (req, res, next) => {
-  req.logout((err) => {
-    if (err) return next(err);
-    req.session.destroy(() => {
-      res.clearCookie("token");
-      res.json({ message: "Logged out successfully" });
+authRouter.post("/logout", (req, res) => {
+  try {
+    req.logout((err) => {
+      if (err) {
+        return res
+          .status(500)
+          .json({ success: false, message: "Error during logout" });
+      }
+      req.session.destroy(() => {
+        res.clearCookie("token");
+        return res.json({ success: true, message: "Logged out successfully" });
+      });
     });
-  });
+  } catch (error) {
+    console.error("Unexpected error logging out:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
 });
 
 export default authRouter;

@@ -4,13 +4,14 @@ export const TopSearchFinder = async (req, res) => {
   try {
     const topSearchData = await SearchInputShow.find()
       .sort({ searchCount: -1 })
+      .sort({ createdAt: -1 })
       .limit(5);
 
     console.log(topSearchData);
 
     if (topSearchData.length == 0) {
       const data = await axios.get(
-        `https://api.unsplash.com/search/photos?query=${"nature"}&page=${"1"}&per_page=20`,
+        `https://api.unsplash.com/search/photos?query=${"random"}&page=${"1"}&per_page=20`,
         {
           headers: {
             Authorization: `Client-ID ${process.env.UNSPLASH_ACCESS_KEY}`,
@@ -30,7 +31,7 @@ export const TopSearchFinder = async (req, res) => {
     const input = topSearchData[0].input;
     console.log(input);
     const page = 1;
-    
+
     const data = await axios.get(
       `https://api.unsplash.com/search/photos?query=${input}&page=${page}&per_page=20`,
       {
