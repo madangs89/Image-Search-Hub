@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import axios from "axios";
 import PageLoader from "./components/PageLoader";
 import AuthFailure from "./pages/AuthFailure";
+import NotFound from "./pages/NotFound";
 
 const App = () => {
   const navigate = useNavigate();
@@ -45,6 +46,7 @@ const App = () => {
         <Route path="/" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/failure" element={<AuthFailure />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </div>
   );
