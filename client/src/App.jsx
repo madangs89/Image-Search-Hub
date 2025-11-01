@@ -19,7 +19,7 @@ const App = () => {
         );
         console.log("Auth Status:", res.data);
         if (res.data.authenticated) {
-         navigate("/dashboard");
+          navigate("/dashboard");
         } else {
           navigate("/");
         }
@@ -31,7 +31,7 @@ const App = () => {
   }, []);
 
   return (
-    <div>
+    <div className="h-screen overflow-hidden bg-[#fafbff]">
       <Navbar />
 
       <Routes>
