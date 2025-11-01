@@ -65,6 +65,10 @@ Image-Search-Hub/
 | **Top Searches** | <img width="1915" height="918" alt="Top Searches" src="https://github.com/user-attachments/assets/1941a736-d99b-4b75-82d4-0281f4a081e3" /> |
 | **History Sidebar** | <img width="498" height="929" alt="History Sidebar" src="https://github.com/user-attachments/assets/ac2277e6-b35f-46ed-8230-2ecf86d4124d" /> |
 | **Multi-Select** | <img width="1919" height="919" alt="Multi-Select" src="https://github.com/user-attachments/assets/f2f5294e-1fbb-4695-9576-1c4b21bd09f8" /> |
+| **Not Found Page** | <img width="1919" height="912" alt="image" src="https://github.com/user-attachments/assets/4aadb9e4-31e2-4cd6-b59d-2678ca6306c9" />|
+| **Auth Failure Page** | <img width="1916" height="916" alt="image" src="https://github.com/user-attachments/assets/2836fba0-a3c3-4685-bff9-b3e2d29143ee" />|
+| **Loading Page** | <img width="1919" height="917" alt="image" src="https://github.com/user-attachments/assets/5c14fdbd-8265-477e-b2c7-342b2f2017dc" />
+|
 
 ---
 
